@@ -1,4 +1,4 @@
-import { testForEvent } from '@gurupras/test-helpers'
+const { testForEvent } = require('@gurupras/test-helpers')
 
 const events = ['connect', 'close', 'no-stream', 'stream', 'track']
 
@@ -24,4 +24,4 @@ function testImplementation (ctor) {
   })
 }
 
-export default testImplementation // eslint-disable-line jest/no-export
+module.exports = testImplementation // eslint-disable-line jest/no-export
