@@ -1,6 +1,8 @@
 import AbstractWebRTC from '../index'
 import testImplementation from './test-implementation'
 
+const methods = ['setup', 'discover', 'updateVolume', 'destroy', 'sendScreen', 'stopScreen', 'sendWebcam']
+
 describe('AbstractWebRTC', () => {
   testImplementation(() => new AbstractWebRTC())
 
@@ -9,7 +11,6 @@ describe('AbstractWebRTC', () => {
     beforeEach(() => {
       instance = new AbstractWebRTC()
     })
-    const methods = ['setup', 'destroy', 'sendScreen', 'stopScreen', 'sendWebcam']
     test.each(methods)('%s throws error', async (method) => {
       await expect(instance[method]()).rejects.toThrow()
     })

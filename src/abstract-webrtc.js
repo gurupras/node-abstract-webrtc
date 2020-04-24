@@ -11,6 +11,14 @@ class AbstractWebRTC {
     })
   }
 
+  async discover () {
+    throw new Error('Unimplemented')
+  }
+
+  async updateVolume () {
+    throw new Error('Unimplemented')
+  }
+
   async setup () {
     throw new Error('Unimplemented')
   }
