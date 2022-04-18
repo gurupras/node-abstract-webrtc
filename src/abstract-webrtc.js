@@ -11,7 +11,7 @@ class AbstractWebRTC {
     })
   }
 
-  async onRemoteTrack (track, stream) {
+  async onRemoteTrack (track, stream, info) {
     if (track.kind === 'audio') {
       await this.setupGainNode(track, stream)
     }
