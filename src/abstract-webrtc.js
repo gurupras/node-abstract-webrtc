@@ -11,6 +11,40 @@ class AbstractWebRTC {
     })
   }
 
+  async onRemoteTrack (track, stream) {
+    if (track.kind === 'audio') {
+      await this.setupGainNode(track, stream)
+    }
+  }
+
+  async setupGainNode (audioTrack, stream) {
+    const ctx = new AudioContext()
+    const src = ctx.createMediaStreamSource(new MediaStream([audioTrack]))
+    const gainNode = ctx.createGain()
+    gainNode.gain.value = 1
+    // Connect the nodes
+    src.connect(gainNode)
+    gainNode.connect(ctx.destination)
+    stream.originalTrack = audioTrack
+    audioTrack.hasGainNode = true
+    stream.gainNode = gainNode
+    // Set up a method on the stream to change its volume
+    stream.volume = volume => {
+      if (ctx.state === 'suspended') {
+        // We need to start this
+        ctx.resume()
+      }
+      gainNode.gain.value = volume * volume
+    }
+    if (this.options.isChrome) {
+      const audio = new Audio()
+      audio.muted = true
+      const tmpStream = new MediaStream([audioTrack])
+      audio.srcObject = tmpStream
+      stream.audio = audio
+    }
+  }
+
   async discover () {
     throw new Error('Unimplemented')
   }
