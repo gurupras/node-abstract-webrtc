@@ -12,21 +12,16 @@ class AbstractWebRTC {
   }
 
   async onRemoteTrack (track, stream, info) {
-    if (track.kind === 'audio') {
-      await this.setupGainNode(track, stream)
+    if (track.kind !== 'audio') {
+      return
     }
-  }
-
-  async setupGainNode (audioTrack, stream) {
     const ctx = new AudioContext()
-    const src = ctx.createMediaStreamSource(new MediaStream([audioTrack]))
-    const gainNode = ctx.createGain()
-    gainNode.gain.value = 1
-    // Connect the nodes
-    src.connect(gainNode)
-    gainNode.connect(ctx.destination)
-    stream.originalTrack = audioTrack
-    audioTrack.hasGainNode = true
+    const src = ctx.createMediaStreamSource(new MediaStream([track]))
+    const gainNode = await this.setupGainNode(src, ctx)
+
+    stream.ctx = ctx
+    stream.originalTrack = track
+    track.hasGainNode = true
     stream.gainNode = gainNode
     // Set up a method on the stream to change its volume
     stream.volume = volume => {
@@ -37,12 +32,25 @@ class AbstractWebRTC {
       gainNode.gain.value = volume * volume
     }
     if (this.options.isChrome) {
-      const audio = new Audio()
-      audio.muted = true
-      const tmpStream = new MediaStream([audioTrack])
-      audio.srcObject = tmpStream
+      const audio = this._audioContextChromeWorkaround(track)
       stream.audio = audio
     }
+  }
+
+  async setupGainNode (audioNode, ctx) {
+    const gainNode = ctx.createGain()
+    gainNode.gain.value = 1
+    // Connect the nodes
+    audioNode.connect(gainNode)
+    return gainNode
+  }
+
+  _audioContextChromeWorkaround (track) {
+    const audio = new Audio()
+    audio.muted = true
+    const tmpStream = new MediaStream([track])
+    audio.srcObject = tmpStream
+    return audio
   }
 
   async discover () {
