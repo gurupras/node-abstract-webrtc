@@ -18,6 +18,7 @@ class AbstractWebRTC {
     const ctx = new AudioContext()
     const src = ctx.createMediaStreamSource(new MediaStream([track]))
     const gainNode = await this.setupGainNode(src, ctx)
+    gainNode.connect(ctx.destination)
 
     stream.ctx = ctx
     stream.originalTrack = track
