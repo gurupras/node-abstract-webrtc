@@ -54,6 +54,10 @@ class AbstractWebRTC {
     return audio
   }
 
+  async updateSocket (socket) {
+    throw new Error('Unimplemented')
+  }
+
   async discover () {
     throw new Error('Unimplemented')
   }
